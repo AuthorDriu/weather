@@ -1,224 +1,282 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-
+    <title>Weather App</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        body {
+            background-color: #f8f9fa;
+            padding-bottom: 50px;
+        }
+        .navbar {
+            margin-bottom: 30px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .weather-card {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 30px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+        .weather-info {
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        .weather-info:last-child {
+            border-bottom: none;
+        }
+        .forecast-table {
+            width: 100%;
+            margin-bottom: 20px;
+        }
+        .forecast-table th {
+            background-color: #f1f1f1;
+            padding: 12px;
+            text-align: left;
+        }
+        .forecast-table td {
+            padding: 12px;
+            border-bottom: 1px solid #eee;
+        }
+        .forecast-table tr:hover {
+            background-color: #f9f9f9;
+        }
+        .pagination-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .btn-custom {
+            background-color: #0d6efd;
+            color: white;
+            border: none;
+            padding: 8px 20px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+        .btn-custom:hover {
+            background-color: #0b5ed7;
+        }
+        .search-input {
+            padding: 8px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            width: 300px;
+            margin-right: 10px;
+        }
+        .search-container {
+            display: flex;
+            align-items: center;
+        }
+        .error-message {
+            color: #dc3545;
+            margin-top: 10px;
+            display: none;
+        }
+    </style>
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">Weather app</a>
-
-            <div style="align-content: left; width: 60%;">
-                <input type="text" placeholder="Москва" id="city-name" style="width: 40%">
-                <input type="button" value="Узнать погоду!" id="go-search-btn">
+        <div class="container">
+            <a class="navbar-brand fw-bold" href="#">Weather App</a>
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="Введите город (например, Москва)" id="city-name">
+                <button class="btn btn-custom" id="go-search-btn">Узнать погоду</button>
             </div>
         </div>
     </nav>
 
-    <div class="mx-auto current-weather" style="width: 80%">
-        <h2>Текущая погода</h2>
-        <div class="row">
-            <div class="col-1" style="width: 30%">
-                <span>Время:</snap>
-            </div>
-            <div class="col-2">
-                <span id="current-time"></span>
-            </div>
-        </div>    
+    <div class="container">
+        <div class="weather-card">
+            <h2 class="mb-4">Текущая погода</h2>
+            <div id="error-message" class="error-message"></div>
             
-        <div class="row">
-            <div class="col-1" style="width: 30%">
-                <span>Температура:</snap>
+            <div class="weather-info row">
+                <div class="col-md-3 fw-bold">Время:</div>
+                <div class="col-md-9" id="current-time">—</div>
             </div>
-            <div class="col-2">
-                <span id="current-temp"></span>
+            
+            <div class="weather-info row">
+                <div class="col-md-3 fw-bold">Температура:</div>
+                <div class="col-md-9" id="current-temp">—</div>
+            </div>
+            
+            <div class="weather-info row">
+                <div class="col-md-3 fw-bold">Влажность:</div>
+                <div class="col-md-9" id="current-humidity">—</div>
+            </div>
+            
+            <div class="weather-info row">
+                <div class="col-md-3 fw-bold">Скорость ветра:</div>
+                <div class="col-md-9" id="current-wind-speed">—</div>
+            </div>
+            
+            <div class="weather-info row">
+                <div class="col-md-3 fw-bold">Направление ветра:</div>
+                <div class="col-md-9" id="current-wind-direction">—</div>
             </div>
         </div>
-            
-            
-        <div class="row">
-            <div class="col-1" style="width: 30%">
-                <span>Влажность:</snap>
-            </div>
-            <div class="col-2">
-                <span id="current-humidity"></span>
-            </div>
-        </div>
-            
-            
-        <div class="row">
-            <div class="col-1" style="width: 30%">
-                <span>Скорость ветра:</snap>
-            </div>
-            <div class="col-2">
-                <span id="current-wind-speed"></span>
-            </div>
-        </div>
-            
-            
-        <div class="row">
-            <div class="col-1" style="width: 30%">
-                <span>Направление ветра:</snap>
-            </div>
-            <div class="col-2">
-                <span id="current-wind-direction"></span>
-            </div>
-        </div>
-    </div>
 
-    <div class="container-fluid hourly">
-        <h2>Прогноз каждый час</h2>
-        <table>
-            <thead>
-                <th>№</th>
-                <th>Время</th>
-                <th>Температура</th>
-                <th>Относительная влажность</th>
-                <th>Скорость ветра</th>
-                <th>Направление ветра</th>
-            </thead>
-            <tbody id="forecast-body">
-                
-            </tbody>
-        </table>
-        <div class="container-fluid">
-            <input type="button" value="предыдущая" id="prev-page">
-            <input type="button" value="следующая" id="next-page">
+        <div class="weather-card">
+            <h2 class="mb-4">Почасовой прогноз</h2>
+            <div class="table-responsive">
+                <table class="forecast-table">
+                    <thead>
+                        <tr>
+                            <th>№</th>
+                            <th>Время</th>
+                            <th>Температура</th>
+                            <th>Влажность</th>
+                            <th>Скорость ветра</th>
+                            <th>Направление ветра</th>
+                        </tr>
+                    </thead>
+                    <tbody id="forecast-body">
+                        <tr>
+                            <td colspan="6" class="text-center">Введите город, чтобы увидеть прогноз</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="pagination-controls">
+                <button class="btn btn-custom" id="prev-page">Предыдущая</button>
+                <span id="page-info">Страница 1</span>
+                <button class="btn btn-custom" id="next-page">Следующая</button>
+            </div>
         </div>
     </div>
 
     <script>
+        let forecast = null;
+        let page = 0;
+        const page_size = 10;
 
-        let forecast = null
-        let page = 0
-        let page_size = 10
+        function showError(message) {
+            const errorElement = document.getElementById('error-message');
+            errorElement.textContent = message;
+            errorElement.style.display = 'block';
+        }
+
+        function hideError() {
+            document.getElementById('error-message').style.display = 'none';
+        }
 
         function fetch_current(data) {
-            document.getElementById('current-time').innerHTML = data['time']
-            document.getElementById('current-temp').innerHTML = data['temperature']
-            document.getElementById('current-humidity').innerHTML = data['relative_humidity']
-            document.getElementById('current-wind-speed').innerHTML = data['wind_speed']
-            document.getElementById('current-wind-direction').innerHTML = data['wind_direction']
+            document.getElementById('current-time').textContent = data.time || '—';
+            document.getElementById('current-temp').textContent = data.temperature ? `${data.temperature} °C` : '—';
+            document.getElementById('current-humidity').textContent = data.relative_humidity ? `${data.relative_humidity}%` : '—';
+            document.getElementById('current-wind-speed').textContent = data.wind_speed ? `${data.wind_speed} м/с` : '—';
+            document.getElementById('current-wind-direction').textContent = data.wind_direction || '—';
         }
 
         function fetch_forecast(data) {
-            let objs = data.forecast
-            let _forecast = []
-
-            for (let i = 0; i < objs.length; ++i) {
-                _forecast.push({
-                    time: objs[i].time,
-                    temperature: objs[i].temperature,
-                    relative_humidity: objs[i].relative_humidity,
-                    wind_speed: objs[i].wind_speed,
-                    wind_direction: objs[i].wind_direction
-                })
-            }
-
-            forecast = _forecast
+            forecast = data.forecast.map(item => ({
+                time: item.time,
+                temperature: item.temperature ? `${item.temperature} °C` : '—',
+                relative_humidity: item.relative_humidity ? `${item.relative_humidity}%` : '—',
+                wind_speed: item.wind_speed ? `${item.wind_speed} м/с` : '—',
+                wind_direction: item.wind_direction || '—'
+            }));
         }
 
-        function build_forecast(page) {
+        function build_forecast(currentPage) {
+            const table = document.getElementById('forecast-body');
+            table.innerHTML = '';
 
-            let start = page * page_size
-            let table = document.getElementById('forecast-body')
-
-            if (table?.childNodes.length != 0) {
-                table.innerHTML = ''
+            if (!forecast || forecast.length === 0) {
+                table.innerHTML = '<tr><td colspan="6" class="text-center">Нет данных для отображения</td></tr>';
+                return;
             }
 
-            for (let i = start; i < start + page_size || !forecast[i]; ++i) {
-                // Создание строки
-                let row = document.createElement('tr')
+            const start = currentPage * page_size;
+            const end = Math.min(start + page_size, forecast.length);
 
-                let number = document.createElement('td')
-                number.innerHTML = i + 1
-                
-                let time = document.createElement('td')
-                time.innerHTML = forecast[i].time
+            for (let i = start; i < end; i++) {
+                const row = document.createElement('tr');
+                const item = forecast[i];
 
-                let temperature = document.createElement('td')
-                temperature.innerHTML = forecast[i].temperature
+                row.innerHTML = `
+                    <td>${i + 1}</td>
+                    <td>${item.time}</td>
+                    <td>${item.temperature}</td>
+                    <td>${item.relative_humidity}</td>
+                    <td>${item.wind_speed}</td>
+                    <td>${item.wind_direction}</td>
+                `;
 
-                let relative_humidity = document.createElement('td')
-                relative_humidity.innerHTML = forecast[i].relative_humidity
-
-                let wind_speed = document.createElement('td')
-                wind_speed.innerHTML = forecast[i].wind_speed
-
-                let wind_direction = document.createElement('td')
-                wind_direction.innerHTML = forecast[i].wind_direction
-
-                row.appendChild(number)
-                row.appendChild(time)
-                row.appendChild(temperature)
-                row.appendChild(relative_humidity)
-                row.appendChild(wind_speed)
-                row.appendChild(wind_direction)
-
-                table.appendChild(row)
+                table.appendChild(row);
             }
+
+            // Обновление информации о странице
+            const totalPages = Math.ceil(forecast.length / page_size);
+            document.getElementById('page-info').textContent = `Страница ${currentPage + 1} из ${totalPages}`;
         }
 
         function fetch_weather(city) {
-            const baseUrl = 'http://127.0.0.1:8000/api/fetch'
-            const queryString = `?city=${encodeURIComponent(city)}`
+            if (!city || city.trim() === '') {
+                showError('Пожалуйста, введите название города');
+                return;
+            }
 
-            fetch(baseUrl+queryString)
-            .then(response => {
-                if (response.status != 200) {
-                    console.error(response)
-                    alert(`Не удалось получить погоду для: ${city}. Повторите попытку или проверьте правильность написания.`)
-                }
-                return response.json()
-            })
-            .then(data => {
-                console.log(data)
-                fetch_current(data)
-                fetch_forecast(data)
-                build_forecast(page)
-            })
-            .catch(err => {
-                console.error(err)
-                alert(`Не удалось получить погоду для: ${city}. Повторите попытку или проверьте правильность написания.`)
-            })
+            hideError();
+            
+            const baseUrl = 'http://127.0.0.1:8000/api/fetch';
+            const queryString = `?city=${encodeURIComponent(city)}`;
+
+            fetch(baseUrl + queryString)
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error(`Ошибка HTTP: ${response.status}`);
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    fetch_current(data);
+                    fetch_forecast(data);
+                    page = 0; // Сброс на первую страницу при новом запросе
+                    build_forecast(page);
+                })
+                .catch(err => {
+                    console.error('Ошибка:', err);
+                    showError(`Не удалось получить данные для города: ${city}. Проверьте название и попробуйте снова.`);
+                });
         }
 
+        // Обработчики событий
         document.getElementById('go-search-btn').addEventListener('click', () => {
-            let city = document.getElementById('city-name').value
-            if (city.length === 0) {
-                console.error('empty city name')
-                return
+            const city = document.getElementById('city-name').value.trim();
+            fetch_weather(city);
+        });
+
+        document.getElementById('city-name').addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                const city = document.getElementById('city-name').value.trim();
+                fetch_weather(city);
             }
-            console.log(`go search ${city}`)
-            fetch_weather(city)
-        })
+        });
 
         document.getElementById('prev-page').addEventListener('click', () => {
-            if (page <= 0) {
-                page = 0
-                return
-            }
-
-            page -= 1
-            build_forecast(page)
-        })
+            if (page <= 0 || !forecast) return;
+            page -= 1;
+            build_forecast(page);
+        });
 
         document.getElementById('next-page').addEventListener('click', () => {
-            let page_amount = Math.floor(forecast.length / page_size + ((forecast.length % page_size == 0) ? 0 : 1))
-            if (page >= page_amount - 1) {
-                page = page_amount - 1
-                return
-            }
+            if (!forecast) return;
+            const totalPages = Math.ceil(forecast.length / page_size);
+            if (page >= totalPages - 1) return;
+            page += 1;
+            build_forecast(page);
+        });
 
-            page += 1
-            build_forecast(page)
-        })
+        // Инициализация - можно загрузить данные для города по умолчанию
+        // fetch_weather("Москва");
     </script>
 </body>
 </html>

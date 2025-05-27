@@ -26,6 +26,17 @@ class WeatherClient:
         pass
 
     async def get(self, target: WeatherRequest) -> Weather | None:
+        """WeatherClient.get(target: WeatherRequest)
+
+        Возвращает текущую погоду и почасовой прогноз для заданной цели,
+        если по какой-то причине получить прогноз не удалось, возвращается None
+
+        Args:
+            target (WeatherRequest): цель, для которой ищется прогноз погоды
+
+        Returns:
+            Weather | None: Прогноз погоды или None
+        """
         coords: Coordinates = None
         if isinstance(target.target, City):
             coords = get_coordinates(target.target)

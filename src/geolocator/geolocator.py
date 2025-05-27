@@ -1,5 +1,3 @@
-import random 
-import string
 import hashlib
 
 from geopy.geocoders import Nominatim
@@ -57,10 +55,21 @@ def _from_geolocator(city: City) -> Coordinates | None:
     return coords
 
 
-def get_coordinates(city: City) -> Coordinates:
+def get_coordinates(city: City) -> Coordinates | None:
+    """get_coordinates(city: City)
+
+    
+    Args:
+        city (City): город, координаты которого необходимо определить
+
+    Returns:
+        Coordinates | None: координаты города, если удалось найти в кэше или через Nominatum, иначе None
+    """
+
     found, coords = _from_database(city)
     if not found:
         coords = _from_geolocator(city)
+        
         if coords is None:
             latitude = None
             longitude = None
